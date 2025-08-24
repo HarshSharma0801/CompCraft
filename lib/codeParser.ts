@@ -45,51 +45,72 @@ export function updateComponentCode(
   property: string,
   value: string
 ): string {
-  // This is a simplified implementation
-  // In a real app, you'd use a proper AST parser like @babel/parser
+  console.log(`[CodeParser] Updating ${property} to ${value}`);
+  console.log(`[CodeParser] Target element:`, selectedElement);
 
-  let updatedCode = code;
+  if (property === "text") {
+    return updateTextContent(code, selectedElement, value);
+  } else {
+    return updateStyleProperty(code, selectedElement, property, value);
+  }
+}
 
-  if (property === "text" && selectedElement.text) {
-    // Update text content
-    const escapedText = escapeRegExp(selectedElement.text);
-    const textRegex = new RegExp(`(>)${escapedText}(<)`, "g");
-    updatedCode = updatedCode.replace(textRegex, `$1${value}$2`);
-  } else if (property === "color") {
-    // Update text color
-    updatedCode = updateStyleProperty(
-      updatedCode,
-      selectedElement,
-      "color",
-      value
-    );
-  } else if (property === "backgroundColor") {
-    // Update background color
-    updatedCode = updateStyleProperty(
-      updatedCode,
-      selectedElement,
-      "backgroundColor",
-      value
-    );
-  } else if (property === "fontSize") {
-    // Update font size
-    updatedCode = updateStyleProperty(
-      updatedCode,
-      selectedElement,
-      "fontSize",
-      value
-    );
-  } else if (property === "fontWeight") {
-    // Update font weight
-    updatedCode = updateStyleProperty(
-      updatedCode,
-      selectedElement,
-      "fontWeight",
-      value
-    );
+function updateTextContent(
+  code: string,
+  selectedElement: SelectedElement,
+  newText: string
+): string {
+  if (!selectedElement.text) return code;
+
+  console.log(
+    `[CodeParser] Updating text from "${selectedElement.text}" to "${newText}"`
+  );
+
+  // Strategy 1: Exact text match with tag context
+  if (selectedElement.tagName && selectedElement.signature) {
+    const signature = selectedElement.signature;
+
+    // Find the exact element using multiple attributes
+    const patterns = [
+      // Pattern 1: Tag with exact text content
+      new RegExp(
+        `(<${signature.tag}[^>]*>)([^<]*${escapeRegExp(
+          selectedElement.text
+        )}[^<]*)(</${signature.tag}>)`,
+        "gi"
+      ),
+      // Pattern 2: Tag with classes and text
+      signature.classes &&
+        new RegExp(
+          `(<${signature.tag}[^>]*className="[^"]*${escapeRegExp(
+            signature.classes
+          )}[^"]*"[^>]*>)([^<]*${escapeRegExp(selectedElement.text)}[^<]*)(</${
+            signature.tag
+          }>)`,
+          "gi"
+        ),
+    ].filter(Boolean);
+
+    for (const pattern of patterns) {
+      if (pattern && code.match(pattern)) {
+        console.log(`[CodeParser] Found text pattern match`);
+        return code.replace(pattern, (match, openTag, content, closeTag) => {
+          const newContent = content.replace(
+            new RegExp(escapeRegExp(selectedElement.text!), "gi"),
+            newText
+          );
+          return openTag + newContent + closeTag;
+        });
+      }
+    }
   }
 
-  return updatedCode;
+  // Fallback: Simple text replacement (less precise)
+  console.log(`[CodeParser] Using fallback text replacement`);
+  return code.replace(
+    new RegExp(escapeRegExp(selectedElement.text), "g"),
+    newText
+  );
 }
 
 function updateStyleProperty(
@@ -98,60 +119,251 @@ function updateStyleProperty(
   property: string,
   value: string
 ): string {
-  // This is a simplified approach - in production, use an AST parser
+  console.log(`[CodeParser] Updating style ${property} to ${value}`);
 
-  // First, try to find inline styles
-  const inlineStyleRegex = /style={{([^}]+)}}/g;
-  const hasInlineStyle = code.match(inlineStyleRegex);
-
-  if (hasInlineStyle) {
-    // Update existing inline style
-    return code.replace(inlineStyleRegex, (match, styles) => {
-      const styleObj = parseInlineStyles(styles);
-      styleObj[property] =
-        property === "fontSize" || property === "fontWeight"
-          ? value
-          : `'${value}'`;
-      const newStyles = Object.entries(styleObj)
-        .map(([key, val]) => `${key}: ${val}`)
-        .join(", ");
-      return `style={{${newStyles}}}`;
-    });
-  } else {
-    // Add inline style
-    // Find the element and add style attribute
-    // This is simplified - in production, use proper AST manipulation
-    const elementRegex = new RegExp(`(<\\w+[^>]*)(>)`, "g");
-    let elementIndex = 0;
-    const targetIndex = parseInt(selectedElement.path.split(".").pop() || "0");
-
-    return code.replace(elementRegex, (match, tag, closing) => {
-      if (elementIndex === targetIndex) {
-        elementIndex++;
-        const styleValue =
-          property === "fontSize" || property === "fontWeight"
-            ? `{{${property}: ${value}}}`
-            : `{{${property}: '${value}'}}`;
-        return `${tag} style=${styleValue}${closing}`;
-      }
-      elementIndex++;
-      return match;
-    });
+  if (!selectedElement.signature) {
+    console.log(`[CodeParser] No signature available, skipping update`);
+    return code;
   }
+
+  const signature = selectedElement.signature;
+
+  // Strategy 1: Multi-attribute matching for highest precision
+  const elementMatcher = new ElementMatcher(code, selectedElement);
+  const targetElement = elementMatcher.findBestMatch();
+
+  if (targetElement) {
+    console.log(`[CodeParser] Found target element:`, targetElement);
+    return updateElementStyle(code, targetElement, property, value);
+  }
+
+  console.log(`[CodeParser] Could not find target element for style update`);
+  return code;
+}
+
+class ElementMatcher {
+  private code: string;
+  private selectedElement: SelectedElement;
+  private elements: Array<{
+    fullMatch: string;
+    openTag: string;
+    content: string;
+    closeTag: string;
+    tagName: string;
+    attributes: string;
+    textContent: string;
+    position: number;
+    score: number;
+  }> = [];
+
+  constructor(code: string, selectedElement: SelectedElement) {
+    this.code = code;
+    this.selectedElement = selectedElement;
+    this.parseElements();
+  }
+
+  private parseElements() {
+    if (!this.selectedElement.signature) return;
+
+    const tagName = this.selectedElement.signature.tag;
+    const elementRegex = new RegExp(
+      `(<${tagName}[^>]*>)(.*?)(</${tagName}>)`,
+      "gis"
+    );
+
+    let match;
+    let position = 0;
+
+    while ((match = elementRegex.exec(this.code)) !== null) {
+      const [fullMatch, openTag, content, closeTag] = match;
+      const textContent = content.replace(/<[^>]*>/g, "").trim();
+
+      this.elements.push({
+        fullMatch,
+        openTag,
+        content,
+        closeTag,
+        tagName,
+        attributes: this.extractAttributes(openTag),
+        textContent,
+        position,
+        score: this.calculateMatchScore(openTag, textContent, position),
+      });
+
+      position++;
+    }
+
+    // Sort by score (highest first)
+    this.elements.sort((a, b) => b.score - a.score);
+  }
+
+  private extractAttributes(openTag: string): string {
+    const attrMatch = openTag.match(/<\w+(.*)>/);
+    return attrMatch ? attrMatch[1].trim() : "";
+  }
+
+  private calculateMatchScore(
+    openTag: string,
+    textContent: string,
+    position: number
+  ): number {
+    let score = 0;
+    const signature = this.selectedElement.signature!;
+
+    // Text content match (highest weight)
+    if (
+      signature.text &&
+      textContent.toLowerCase().includes(signature.text.toLowerCase())
+    ) {
+      score += 100;
+      // Exact match gets bonus
+      if (textContent.trim() === signature.text.trim()) {
+        score += 50;
+      }
+    }
+
+    // Class name match
+    if (signature.classes && openTag.includes(signature.classes)) {
+      score += 30;
+    }
+
+    // Position match (if we have multiple similar elements)
+    if (position === signature.position) {
+      score += 20;
+    }
+
+    // ID match (if present)
+    if (signature.id && openTag.includes(`id="${signature.id}"`)) {
+      score += 40;
+    }
+
+    // Child count match
+    const childMatches = (textContent.match(/<\w+/g) || []).length;
+    if (childMatches === signature.childCount) {
+      score += 10;
+    }
+
+    console.log(`[ElementMatcher] Element score: ${score}`, {
+      textContent: textContent.substring(0, 30),
+      position,
+      signature,
+    });
+
+    return score;
+  }
+
+  findBestMatch() {
+    return this.elements.length > 0 ? this.elements[0] : null;
+  }
+}
+
+function updateElementStyle(
+  code: string,
+  element: any,
+  property: string,
+  value: string
+): string {
+  const { fullMatch, openTag, content, closeTag } = element;
+
+  // Check if the opening tag already has a style attribute
+  const existingStyleMatch = openTag.match(/style={{([^}]+)}}/);
+
+  let newOpenTag;
+  if (existingStyleMatch) {
+    // Update existing style
+    const existingStyles = existingStyleMatch[1];
+    console.log(`[CodeParser] Updating existing styles:`, existingStyles);
+
+    const styleObj = parseInlineStyles(existingStyles);
+
+    // Update the specific property with proper formatting
+    if (property === "fontSize") {
+      styleObj[property] = `"${value}"`;
+    } else if (property === "fontWeight") {
+      styleObj[property] = value;
+    } else if (property === "color" || property === "backgroundColor") {
+      styleObj[property] = `"${value}"`;
+    } else {
+      styleObj[property] = `"${value}"`;
+    }
+
+    // Rebuild the style object
+    const newStyles = Object.entries(styleObj)
+      .map(([key, val]) => `${key}: ${val}`)
+      .join(", ");
+
+    newOpenTag = openTag.replace(/style={{[^}]+}}/, `style={{${newStyles}}}`);
+  } else {
+    // Add new style attribute
+    const styleValue =
+      property === "fontWeight"
+        ? `{{${property}: ${value}}}`
+        : `{{${property}: "${value}"}}`;
+
+    newOpenTag = openTag.replace(
+      `<${element.tagName}`,
+      `<${element.tagName} style=${styleValue}`
+    );
+  }
+
+  const newElement = newOpenTag + content + closeTag;
+  console.log(`[CodeParser] Style update complete`);
+
+  return code.replace(fullMatch, newElement);
 }
 
 function parseInlineStyles(styles: string): Record<string, string> {
   const styleObj: Record<string, string> = {};
-  const pairs = styles.split(",").map((s) => s.trim());
 
-  pairs.forEach((pair) => {
-    const [key, value] = pair.split(":").map((s) => s.trim());
+  // Handle complex style strings that might have nested quotes and commas
+  let currentPair = "";
+  let depth = 0;
+  let inQuotes = false;
+  let quoteChar = "";
+
+  for (let i = 0; i < styles.length; i++) {
+    const char = styles[i];
+
+    if ((char === '"' || char === "'") && !inQuotes) {
+      inQuotes = true;
+      quoteChar = char;
+      currentPair += char;
+    } else if (char === quoteChar && inQuotes) {
+      inQuotes = false;
+      quoteChar = "";
+      currentPair += char;
+    } else if (char === "(" && !inQuotes) {
+      depth++;
+      currentPair += char;
+    } else if (char === ")" && !inQuotes) {
+      depth--;
+      currentPair += char;
+    } else if (char === "," && depth === 0 && !inQuotes) {
+      // This is a separator between style properties
+      processPair(currentPair.trim(), styleObj);
+      currentPair = "";
+    } else {
+      currentPair += char;
+    }
+  }
+
+  // Process the last pair
+  if (currentPair.trim()) {
+    processPair(currentPair.trim(), styleObj);
+  }
+
+  return styleObj;
+}
+
+function processPair(pair: string, styleObj: Record<string, string>) {
+  const colonIndex = pair.indexOf(":");
+  if (colonIndex > 0) {
+    const key = pair.substring(0, colonIndex).trim();
+    const value = pair.substring(colonIndex + 1).trim();
     if (key && value) {
       styleObj[key] = value;
     }
-  });
-
-  return styleObj;
+  }
 }
 
 function escapeRegExp(string: string): string {

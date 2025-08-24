@@ -88,13 +88,13 @@ export default function ComponentEditor() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background">
+    <div className="h-screen flex flex-col bg-white">
       {/* Header */}
-      <header className="border-b border-border px-6 py-4">
-        <h1 className="text-2xl font-bold text-foreground">
+      <header className="border-b border-gray-300 px-6 py-4 bg-black">
+        <h1 className="text-2xl font-bold text-white">
           React Component Editor
         </h1>
-        <p className="text-sm text-muted-foreground mt-1">
+        <p className="text-sm text-gray-300 mt-1">
           Paste your React component code and edit it visually
         </p>
       </header>
@@ -102,19 +102,17 @@ export default function ComponentEditor() {
       {/* Main Content */}
       <div className="flex-1 flex overflow-hidden">
         {/* Code Editor */}
-        <div className="w-1/2 border-r border-border flex flex-col">
-          <div className="px-4 py-3 border-b border-border bg-muted/30 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-foreground">
-              Code Editor
-            </h2>
+        <div className="w-1/2 border-r border-gray-300 flex flex-col">
+          <div className="px-4 py-3 border-b border-gray-300 bg-gray-50 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-black">Code Editor</h2>
             <div className="flex gap-2">
               <button
                 onClick={handlePreview}
                 disabled={!hasUnsavedChanges}
-                className={`flex items-center gap-1 px-3 py-1 text-xs rounded-md transition-colors ${
+                className={`flex items-center gap-1 px-3 py-1 text-xs rounded transition-colors ${
                   hasUnsavedChanges
-                    ? "bg-blue-500 text-white hover:bg-blue-600"
-                    : "bg-muted text-muted-foreground cursor-not-allowed"
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
                 <Play className="w-3 h-3" />
@@ -123,10 +121,10 @@ export default function ComponentEditor() {
               <button
                 onClick={handleSave}
                 disabled={!hasUnsavedChanges}
-                className={`flex items-center gap-1 px-3 py-1 text-xs rounded-md transition-colors ${
+                className={`flex items-center gap-1 px-3 py-1 text-xs rounded transition-colors ${
                   hasUnsavedChanges
-                    ? "bg-green-500 text-white hover:bg-green-600"
-                    : "bg-muted text-muted-foreground cursor-not-allowed"
+                    ? "bg-black text-white hover:bg-gray-800"
+                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
                 }`}
               >
                 <Save className="w-3 h-3" />
@@ -143,8 +141,8 @@ export default function ComponentEditor() {
         <div className="w-1/2 flex flex-col">
           {/* Preview */}
           <div className="flex-1 flex flex-col">
-            <div className="px-4 py-3 border-b border-border bg-muted/30">
-              <h2 className="text-sm font-semibold text-foreground">Preview</h2>
+            <div className="px-4 py-3 border-b border-gray-300 bg-gray-50">
+              <h2 className="text-sm font-semibold text-black">Preview</h2>
             </div>
             <div className="flex-1 overflow-auto bg-white">
               {error ? (
@@ -169,7 +167,7 @@ export default function ComponentEditor() {
 
           {/* Property Panel */}
           {selectedElement && (
-            <div className="h-80 border-t border-border">
+            <div className="h-80 border-t border-gray-300">
               <PropertyPanel
                 selectedElement={selectedElement}
                 onPropertyChange={handlePropertyChange}

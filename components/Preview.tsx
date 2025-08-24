@@ -106,6 +106,53 @@ export default function Preview({
               
               console.log('[IFrame] React and ReactDOM loaded successfully');
 
+              // Helper function to get element signature for precise matching
+              function getElementSignature(element) {
+                const tagName = element.tagName.toLowerCase();
+                const textContent = element.textContent?.trim() || '';
+                const className = element.className || '';
+                const id = element.id || '';
+                
+                // Create a unique signature based on multiple attributes
+                const signature = {
+                  tag: tagName,
+                  text: textContent.substring(0, 50), // First 50 chars
+                  classes: className.split(' ').filter(c => !c.includes('hoverable') && !c.includes('selected')).join(' '),
+                  id: id,
+                  hasChildren: element.children.length > 0,
+                  childCount: element.children.length,
+                  position: Array.from(element.parentElement?.children || []).indexOf(element)
+                };
+                
+                return signature;
+              }
+
+              // Enhanced element path generation
+              function generateElementPath(element, root) {
+                const path = [];
+                let current = element;
+                
+                while (current && current !== root && current !== document.body) {
+                  const parent = current.parentElement;
+                  if (parent) {
+                    const siblings = Array.from(parent.children);
+                    const index = siblings.indexOf(current);
+                    const tagIndex = siblings.filter((sibling, i) => 
+                      i <= index && sibling.tagName === current.tagName
+                    ).length - 1;
+                    
+                    path.unshift({
+                      index: index,
+                      tagIndex: tagIndex,
+                      tagName: current.tagName.toLowerCase()
+                    });
+                  }
+                  current = parent;
+                }
+                
+                return path;
+              }
+
               // Helper function to add click handlers
               function addClickHandlers(element, path = '') {
                 if (!element || element.nodeType !== 1) return;
@@ -127,15 +174,47 @@ export default function Preview({
                     // Add selection to clicked element
                     element.classList.add('selected-element');
                     
-                    // Get element info
+                    // Get computed styles
+                    const computedStyles = window.getComputedStyle(element);
+                    const signature = getElementSignature(element);
+                    const elementPath = generateElementPath(element, document.getElementById('root'));
+                    
+                    // Determine if it's primarily a text element
+                    const isTextElement = element.children.length === 0 || 
+                      (element.children.length === 1 && element.children[0].nodeType === 3);
+                    
+                    // Get element info with enhanced data
                     const elementInfo = {
                       path: element.dataset.path,
-                      type: element.children.length === 0 ? 'text' : 'element',
+                      enhancedPath: elementPath,
+                      signature: signature,
+                      type: isTextElement ? 'text' : 'element',
                       tagName: element.tagName.toLowerCase(),
-                      text: element.textContent,
-                      className: element.className.replace('hoverable-element selected-element', '').trim(),
-                      style: element.getAttribute('style') || ''
+                      text: isTextElement ? element.textContent?.trim() : element.innerText?.trim(),
+                      directText: element.childNodes.length > 0 ? 
+                        Array.from(element.childNodes)
+                          .filter(node => node.nodeType === 3)
+                          .map(node => node.textContent?.trim())
+                          .filter(text => text)
+                          .join(' ') : '',
+                      className: element.className.replace(/hoverable-element|selected-element/g, '').trim(),
+                      style: element.getAttribute('style') || '',
+                      computedStyles: {
+                        color: computedStyles.color,
+                        backgroundColor: computedStyles.backgroundColor,
+                        fontSize: computedStyles.fontSize,
+                        fontWeight: computedStyles.fontWeight,
+                        fontFamily: computedStyles.fontFamily,
+                        textAlign: computedStyles.textAlign,
+                        padding: computedStyles.padding,
+                        margin: computedStyles.margin,
+                        borderRadius: computedStyles.borderRadius,
+                        display: computedStyles.display
+                      },
+                      bounds: element.getBoundingClientRect()
                     };
+                    
+                    console.log('[IFrame] Selected element:', elementInfo);
                     
                     // Send message to parent
                     window.parent.postMessage({
