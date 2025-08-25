@@ -15,13 +15,13 @@ https://github.com/user-attachments/assets/40e442cf-de50-4058-be3b-d41c3af55924
 
 # Screenshots
 
+<img width="1470" height="796" alt="Screenshot 2025-08-26 at 1 11 13 AM" src="https://github.com/user-attachments/assets/1c483ed7-e97b-465b-8b3e-3b186bc6b1c3" />
+
 <img width="1470" height="796" alt="Screenshot 2025-08-26 at 1 12 00 AM" src="https://github.com/user-attachments/assets/f56a3923-6aae-48eb-b218-3dcd75474682" />
 
 <img width="1470" height="796" alt="Screenshot 2025-08-26 at 1 11 51 AM" src="https://github.com/user-attachments/assets/389bec22-57dd-4307-9f79-f579d3c74298" />
 
 <img width="1470" height="796" alt="Screenshot 2025-08-26 at 1 11 20 AM" src="https://github.com/user-attachments/assets/e2a1a18f-77ef-4bb3-ba84-0ff4ccff410f" />
-
-<img width="1470" height="796" alt="Screenshot 2025-08-26 at 1 11 13 AM" src="https://github.com/user-attachments/assets/1c483ed7-e97b-465b-8b3e-3b186bc6b1c3" />
 
 
 ## 🤖 AI-Powered Features
