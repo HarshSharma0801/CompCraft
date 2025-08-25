@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
-import { useUser } from "@clerk/nextjs";
+import React, { useState } from "react";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { ArrowLeft, Save, Code2, LogOut } from "lucide-react";
 import Link from "next/link";
-import { SignOutButton } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
 interface NavbarProps {
@@ -25,7 +24,9 @@ export default function Navbar({
   variant = "light",
 }: NavbarProps) {
   const { user, isLoaded } = useUser();
+  const { signOut } = useClerk();
   const router = useRouter();
+  const [isSigningOut, setIsSigningOut] = useState(false);
 
   const bgClasses =
     variant === "light"
@@ -39,6 +40,21 @@ export default function Navbar({
       ? "text-gray-700 hover:bg-white/50 border-gray-300"
       : "text-gray-300 hover:bg-gray-800/50 border-gray-600";
 
+  const handleSignOut = async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut({ redirectUrl: "/" });
+      // The redirectUrl should handle the redirect, but we'll add a fallback
+      router.push("/");
+    } catch (error) {
+      console.error("Sign out error:", error);
+      // Fallback redirect in case of error
+      window.location.href = "/";
+    } finally {
+      setIsSigningOut(false);
+    }
+  };
+
   return (
     <header className={`relative ${bgClasses} border-b shadow-lg`}>
       <div className="max-w-7xl mx-auto px-6 py-4">
@@ -50,7 +66,7 @@ export default function Navbar({
             className="flex cursor-pointer items-center gap-4"
           >
             <div className="flex items-center gap-3">
-              <div className="relative ">
+              <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-75"></div>
                 <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-xl">
                   <Code2 className="w-6 h-6 text-white" />
@@ -62,6 +78,11 @@ export default function Navbar({
                 >
                   {title}
                 </h1>
+                {subtitle && (
+                  <p className={`text-sm ${variant === "light" ? "text-gray-600" : "text-gray-300"}`}>
+                    {subtitle}
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -76,14 +97,14 @@ export default function Navbar({
                   >
                     Dashboard
                   </Link>
-                  <SignOutButton>
-                    <button
-                      className={`flex items-center gap-2 px-6 py-2.5 border rounded-xl font-medium transition-all duration-300 backdrop-blur-sm ${buttonClasses}`}
-                    >
-                      <LogOut className="w-4 h-4" />
-                      Sign Out
-                    </button>
-                  </SignOutButton>
+                  <button
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    className={`flex items-center gap-2 px-6 py-2.5 border rounded-xl font-medium transition-all duration-300 backdrop-blur-sm ${buttonClasses} ${isSigningOut ? "opacity-50 cursor-not-allowed" : ""}`}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    {isSigningOut ? "Signing Out..." : "Sign Out"}
+                  </button>
                 </>
               ) : (
                 <>

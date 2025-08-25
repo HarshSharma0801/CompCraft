@@ -361,8 +361,8 @@ export default function Preview({
     <div className="relative w-full h-full">
       {isLoading && (
         <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-10">
-          <div className="text-muted-foreground text-sm">
-            Loading preview...
+          <div className="min-h-screen bg-white flex items-center justify-center">
+            <div className="w-12 h-12 border-4 border-transparent border-t-blue-600 border-r-purple-600 border-b-indigo-600 rounded-full animate-spin"></div>
           </div>
         </div>
       )}

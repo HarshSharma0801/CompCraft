@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { Save, Code2, Settings, X } from "lucide-react";
@@ -21,10 +21,11 @@ interface Component {
 }
 
 interface ComponentPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export default function ComponentPage({ params }: ComponentPageProps) {
+  const { id } = use(params);
   const { user, isLoaded } = useUser();
   const router = useRouter();
   const [component, setComponent] = useState<Component | null>(null);
@@ -47,11 +48,11 @@ export default function ComponentPage({ params }: ComponentPageProps) {
     if (isLoaded) {
       fetchComponent();
     }
-  }, [isLoaded, params.id]);
+  }, [isLoaded, id]);
 
   const fetchComponent = async () => {
     try {
-      const response = await fetch(`/api/component/${params.id}`);
+      const response = await fetch(`/api/component/${id}`);
       const data = await response.json();
 
       if (data.success) {
@@ -80,7 +81,7 @@ export default function ComponentPage({ params }: ComponentPageProps) {
 
     setSaving(true);
     try {
-      const response = await fetch(`/api/component/${params.id}`, {
+      const response = await fetch(`/api/component/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -127,7 +128,7 @@ export default function ComponentPage({ params }: ComponentPageProps) {
 
     setSaving(true);
     try {
-      const response = await fetch(`/api/component/${params.id}`, {
+      const response = await fetch(`/api/component/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -167,7 +168,7 @@ export default function ComponentPage({ params }: ComponentPageProps) {
   if (loading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="text-gray-600">Loading component...</div>
+        <div className="w-12 h-12 border-4 border-transparent border-t-blue-600 border-r-purple-600 border-b-indigo-600 rounded-full animate-spin"></div>
       </div>
     );
   }
