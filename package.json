@@ -1,5 +1,5 @@
 {
-  "name": "react-component-editor",
+  "name": "compcraft",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -9,22 +9,25 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@babel/standalone": "^7.23.5",
+    "@clerk/nextjs": "^6.31.4",
+    "@monaco-editor/react": "^4.6.0",
+    "clsx": "^2.0.0",
+    "lucide-react": "^0.294.0",
+    "mongodb": "^6.18.0",
+    "mongoose": "^8.18.0",
     "next": "14.0.4",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@babel/standalone": "^7.23.5",
-    "@monaco-editor/react": "^4.6.0",
-    "lucide-react": "^0.294.0",
-    "clsx": "^2.0.0"
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/react": "^18.2.45",
     "@types/node": "^20.10.5",
-    "typescript": "^5.3.3",
-    "tailwindcss": "^3.4.0",
+    "@types/react": "^18.2.45",
     "autoprefixer": "^10.4.16",
-    "postcss": "^8.4.32",
     "eslint": "^8.56.0",
-    "eslint-config-next": "14.0.4"
+    "eslint-config-next": "14.0.4",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.3"
   }
 }

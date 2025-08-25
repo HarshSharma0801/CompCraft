@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Play, Save } from "lucide-react";
+import { Play, Save, Settings } from "lucide-react";
 import CodeEditor from "./CodeEditor";
 import Preview from "./Preview";
 import PropertyPanel from "./PropertyPanel";
@@ -18,27 +18,52 @@ const defaultCode = `function Card() {
     <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden">
       <div className="p-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome to React Editor
+          Welcome to CompCraft
         </h2>
         <p className="text-gray-600 mb-4">
-          Click on any element to edit its properties. You can change text content, colors, font size, and font weight.
+          Click on any element to craft its properties. You can change text content, colors, font size, and font weight.
         </p>
         <button className="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-600 transition-colors">
-          Try Me!
+          Try Crafting!
         </button>
       </div>
     </div>
   )
 }`;
 
-export default function ComponentEditor() {
-  const [code, setCode] = useState(defaultCode);
-  const [previewCode, setPreviewCode] = useState(defaultCode);
+interface ComponentEditorProps {
+  initialCode?: string;
+  onSave?: (code: string, metadata?: any) => Promise<boolean>;
+  saving?: boolean;
+  readOnly?: boolean;
+  showSaveButton?: boolean;
+  showDetailsButton?: boolean;
+  onDetailsClick?: () => void;
+}
+
+export default function ComponentEditor({
+  initialCode = defaultCode,
+  onSave,
+  saving = false,
+  readOnly = false,
+  showSaveButton = true,
+  showDetailsButton = false,
+  onDetailsClick,
+}: ComponentEditorProps) {
+  const [code, setCode] = useState(initialCode);
+  const [previewCode, setPreviewCode] = useState(initialCode);
   const [selectedElement, setSelectedElement] =
     useState<SelectedElement | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [parsedComponent, setParsedComponent] = useState<any>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Update when initialCode changes
+  useEffect(() => {
+    setCode(initialCode);
+    setPreviewCode(initialCode);
+    setHasUnsavedChanges(false);
+  }, [initialCode]);
 
   useEffect(() => {
     try {
@@ -76,10 +101,19 @@ export default function ComponentEditor() {
     setHasUnsavedChanges(newCode !== previewCode);
   };
 
-  const handleSave = () => {
-    setPreviewCode(code);
-    setHasUnsavedChanges(false);
-    setSelectedElement(null);
+  const handleSave = async () => {
+    if (onSave) {
+      const success = await onSave(code);
+      if (success) {
+        setPreviewCode(code);
+        setHasUnsavedChanges(false);
+        setSelectedElement(null);
+      }
+    } else {
+      setPreviewCode(code);
+      setHasUnsavedChanges(false);
+      setSelectedElement(null);
+    }
   };
 
   const handlePreview = () => {
@@ -88,94 +122,106 @@ export default function ComponentEditor() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-white">
-      {/* Header */}
-      <header className="border-b border-gray-300 px-6 py-4 bg-black">
-        <h1 className="text-2xl font-bold text-white">
-          React Component Editor
-        </h1>
-        <p className="text-sm text-gray-300 mt-1">
-          Paste your React component code and edit it visually
-        </p>
-      </header>
-
-      {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Code Editor */}
-        <div className="w-1/2 border-r border-gray-300 flex flex-col">
-          <div className="px-4 py-3 border-b border-gray-300 bg-gray-50 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-black">Code Editor</h2>
-            <div className="flex gap-2">
+    <div className="h-screen flex bg-gradient-to-br from-gray-900 to-gray-800">
+      {/* Code Editor */}
+      <div className="w-1/2 border-r border-gray-700 flex flex-col bg-gray-900/95 backdrop-blur-sm">
+        <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800 flex items-center justify-between">
+          <h2 className="text-sm font-bold text-gray-300">Code Editor</h2>
+          <div className="flex gap-3">
+            {showDetailsButton && (
               <button
-                onClick={handlePreview}
-                disabled={!hasUnsavedChanges}
-                className={`flex items-center gap-1 px-3 py-1 text-xs rounded transition-colors ${
-                  hasUnsavedChanges
-                    ? "bg-black text-white hover:bg-gray-800"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                }`}
+                onClick={() => {
+                  console.log("Details button clicked");
+                  if (onDetailsClick) onDetailsClick();
+                }}
+                className="flex items-center gap-2 px-4 py-2 text-xs rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:from-purple-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
-                <Play className="w-3 h-3" />
-                Preview
+                <Settings className="w-3 h-3" />
+                Details
               </button>
+            )}
+            <button
+              onClick={handlePreview}
+              disabled={!hasUnsavedChanges || readOnly}
+              className={`flex items-center gap-2 px-4 py-2 text-xs rounded-xl font-medium transition-all duration-300 ${
+                hasUnsavedChanges && !readOnly
+                  ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                  : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              <Play className="w-3 h-3" />
+              Preview
+            </button>
+            {showSaveButton && (
               <button
                 onClick={handleSave}
-                disabled={!hasUnsavedChanges}
-                className={`flex items-center gap-1 px-3 py-1 text-xs rounded transition-colors ${
-                  hasUnsavedChanges
-                    ? "bg-black text-white hover:bg-gray-800"
-                    : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                disabled={!hasUnsavedChanges || saving || readOnly}
+                className={`flex items-center gap-2 px-4 py-2 text-xs rounded-xl font-medium transition-all duration-300 ${
+                  hasUnsavedChanges && !saving && !readOnly
+                    ? "bg-gradient-to-r from-emerald-500 to-teal-600 text-white hover:from-emerald-600 hover:to-teal-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
                 }`}
               >
                 <Save className="w-3 h-3" />
-                Save & Preview
+                {saving ? "Saving..." : onSave ? "Save" : "Save & Preview"}
               </button>
-            </div>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <CodeEditor code={code} onChange={handleCodeChange} />
+            )}
           </div>
         </div>
+        <div className="flex-1 overflow-hidden">
+          <CodeEditor
+            code={code}
+            onChange={readOnly ? () => {} : handleCodeChange}
+            readOnly={readOnly}
+          />
+        </div>
+      </div>
 
-        {/* Preview and Properties */}
-        <div className="w-1/2 flex flex-col">
-          {/* Preview */}
-          <div className="flex-1 flex flex-col">
-            <div className="px-4 py-3 border-b border-gray-300 bg-gray-50">
-              <h2 className="text-sm font-semibold text-black">Preview</h2>
-            </div>
-            <div className="flex-1 overflow-auto bg-white">
-              {error ? (
-                <div className="p-4">
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    <p className="text-red-800 text-sm font-medium">
-                      Error parsing component:
+      {/* Preview and Properties */}
+      <div className="w-1/2 flex flex-col bg-gray-900/95 backdrop-blur-sm">
+        {/* Preview */}
+        <div className="flex-1 flex flex-col">
+          <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800">
+            <h2 className="text-sm font-bold text-gray-300">Live Preview ✨</h2>
+          </div>
+          <div className="flex-1 overflow-auto bg-gradient-to-br from-gray-900 to-gray-800">
+            {error ? (
+              <div className="p-6">
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-2xl p-6 shadow-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-red-500 to-pink-500 rounded-full flex items-center justify-center">
+                      <span className="text-white text-sm">!</span>
+                    </div>
+                    <p className="text-red-800 font-bold">
+                      Error parsing component
                     </p>
-                    <p className="text-red-600 text-sm mt-1">{error}</p>
                   </div>
+                  <p className="text-red-600 text-sm leading-relaxed">
+                    {error}
+                  </p>
                 </div>
-              ) : (
-                <Preview
-                  key={previewCode}
-                  code={previewCode}
-                  onElementSelect={setSelectedElement}
-                  selectedElement={selectedElement}
-                />
-              )}
-            </div>
-          </div>
-
-          {/* Property Panel */}
-          {selectedElement && (
-            <div className="h-80 border-t border-gray-300">
-              <PropertyPanel
+              </div>
+            ) : (
+              <Preview
+                key={previewCode}
+                code={previewCode}
+                onElementSelect={setSelectedElement}
                 selectedElement={selectedElement}
-                onPropertyChange={handlePropertyChange}
-                onClose={() => setSelectedElement(null)}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        {/* Property Panel */}
+        {selectedElement && (
+          <div className="h-80 border-t border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800">
+            <PropertyPanel
+              selectedElement={selectedElement}
+              onPropertyChange={handlePropertyChange}
+              onClose={() => setSelectedElement(null)}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

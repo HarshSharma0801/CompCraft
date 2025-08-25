@@ -45,7 +45,12 @@ export default function PropertyPanel({
     const isNewElement = currentSignature !== elementSignatureRef.current;
 
     // Only update if it's a new element AND not currently editing anything
-    if (isNewElement && !isEditingText && !isEditingTextColor && !isEditingBgColor) {
+    if (
+      isNewElement &&
+      !isEditingText &&
+      !isEditingTextColor &&
+      !isEditingBgColor
+    ) {
       const newText = selectedElement.text || selectedElement.directText || "";
       setText(newText);
       setEditedText(newText);
@@ -60,7 +65,10 @@ export default function PropertyPanel({
           setEditedTextColor(newTextColor);
         }
 
-        if (styles.backgroundColor && styles.backgroundColor !== "rgba(0, 0, 0, 0)") {
+        if (
+          styles.backgroundColor &&
+          styles.backgroundColor !== "rgba(0, 0, 0, 0)"
+        ) {
           const newBgColor = parseColor(styles.backgroundColor);
           setBackgroundColor(newBgColor);
           setEditedBgColor(newBgColor);
@@ -85,15 +93,17 @@ export default function PropertyPanel({
   // Convert RGB/RGBA to hex
   const parseColor = (color: string): string => {
     if (color.startsWith("#")) return color;
-    
-    const rgbMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+
+    const rgbMatch = color.match(
+      /rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
+    );
     if (rgbMatch) {
       const r = parseInt(rgbMatch[1]);
       const g = parseInt(rgbMatch[2]);
       const b = parseInt(rgbMatch[3]);
       return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
     }
-    
+
     return "#000000";
   };
 
@@ -189,7 +199,6 @@ export default function PropertyPanel({
 
       {/* Properties */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        
         {/* Element Info */}
         <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
           <h4 className="text-sm font-semibold text-black mb-3 flex items-center gap-2">
@@ -199,11 +208,15 @@ export default function PropertyPanel({
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-gray-600">Tag:</span>
-              <span className="font-mono text-black">&lt;{selectedElement.tagName}&gt;</span>
+              <span className="font-mono text-black">
+                &lt;{selectedElement.tagName}&gt;
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-600">Type:</span>
-              <span className="font-mono text-black">{selectedElement.type}</span>
+              <span className="font-mono text-black">
+                {selectedElement.type}
+              </span>
             </div>
             {selectedElement.className && (
               <div className="flex justify-between">
@@ -233,7 +246,7 @@ export default function PropertyPanel({
                 </button>
               )}
             </div>
-            
+
             {isEditingText ? (
               <div className="space-y-3">
                 <textarea
@@ -321,7 +334,7 @@ export default function PropertyPanel({
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className="w-8 h-8 rounded-lg border border-gray-300"
                 style={{ backgroundColor: textColor }}
               ></div>
@@ -383,11 +396,13 @@ export default function PropertyPanel({
             </div>
           ) : (
             <div className="flex items-center gap-3">
-              <div 
+              <div
                 className="w-8 h-8 rounded-lg border border-gray-300"
                 style={{ backgroundColor: backgroundColor }}
               ></div>
-              <span className="font-mono text-sm text-black">{backgroundColor}</span>
+              <span className="font-mono text-sm text-black">
+                {backgroundColor}
+              </span>
             </div>
           )}
         </div>

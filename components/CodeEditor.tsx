@@ -15,9 +15,14 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
 interface CodeEditorProps {
   code: string;
   onChange: (value: string) => void;
+  readOnly?: boolean;
 }
 
-export default function CodeEditor({ code, onChange }: CodeEditorProps) {
+export default function CodeEditor({
+  code,
+  onChange,
+  readOnly = false,
+}: CodeEditorProps) {
   return (
     <MonacoEditor
       height="100%"
@@ -34,6 +39,7 @@ export default function CodeEditor({ code, onChange }: CodeEditorProps) {
         automaticLayout: true,
         tabSize: 2,
         wordWrap: "on",
+        readOnly,
         padding: { top: 16, bottom: 16 },
         scrollbar: {
           verticalScrollbarSize: 10,
