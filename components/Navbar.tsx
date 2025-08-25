@@ -44,11 +44,9 @@ export default function Navbar({
     setIsSigningOut(true);
     try {
       await signOut({ redirectUrl: "/" });
-      // The redirectUrl should handle the redirect, but we'll add a fallback
       router.push("/");
     } catch (error) {
       console.error("Sign out error:", error);
-      // Fallback redirect in case of error
       window.location.href = "/";
     } finally {
       setIsSigningOut(false);
@@ -79,7 +77,11 @@ export default function Navbar({
                   {title}
                 </h1>
                 {subtitle && (
-                  <p className={`text-sm ${variant === "light" ? "text-gray-600" : "text-gray-300"}`}>
+                  <p
+                    className={`text-sm ${
+                      variant === "light" ? "text-gray-600" : "text-gray-300"
+                    }`}
+                  >
                     {subtitle}
                   </p>
                 )}
@@ -100,7 +102,9 @@ export default function Navbar({
                   <button
                     onClick={handleSignOut}
                     disabled={isSigningOut}
-                    className={`flex items-center gap-2 px-6 py-2.5 border rounded-xl font-medium transition-all duration-300 backdrop-blur-sm ${buttonClasses} ${isSigningOut ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`flex items-center gap-2 px-6 py-2.5 border rounded-xl font-medium transition-all duration-300 backdrop-blur-sm ${buttonClasses} ${
+                      isSigningOut ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                   >
                     <LogOut className="w-4 h-4" />
                     {isSigningOut ? "Signing Out..." : "Sign Out"}

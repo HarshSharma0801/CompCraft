@@ -20,7 +20,6 @@ export default function EditorPage() {
   const [componentTags, setComponentTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
 
-  // Debug logging
   console.log("Editor page - User:", user?.id, "IsLoaded:", isLoaded);
   console.log("Show details button:", !!user);
 
@@ -44,14 +43,12 @@ export default function EditorPage() {
 
   const handleSave = async (code: string) => {
     if (!user) {
-      // Redirect to sign in if not authenticated
       router.push("/sign-in");
       return false;
     }
 
     setSaving(true);
     try {
-      // Extract title from component code (simple heuristic)
       const titleMatch = code.match(/function\s+(\w+)|const\s+(\w+)\s*=/);
       const title = titleMatch?.[1] || titleMatch?.[2] || "Untitled Component";
 
@@ -72,7 +69,6 @@ export default function EditorPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Redirect to the new component page
         router.push(`/component/${data.component.id}`);
         return true;
       } else {
@@ -89,21 +85,18 @@ export default function EditorPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Navbar */}
       <Navbar subtitle="Visual. Powerful. Instant." />
 
-      {/* Editor - Full height minus navbar */}
       <div className="h-[calc(100vh-88px)]">
         <ComponentEditor
           onSave={handleSave}
           saving={saving}
-          showSaveButton={true} // Show save button in editor
-          showDetailsButton={!!user} // Show details button if user is logged in
-          onDetailsClick={() => setShowDetailsModal(true)} // Open details modal
+          showSaveButton={true}
+          showDetailsButton={!!user}
+          onDetailsClick={() => setShowDetailsModal(true)}
         />
       </div>
 
-      {/* Details Modal */}
       {showDetailsModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -121,7 +114,6 @@ export default function EditorPage() {
               </div>
 
               <div className="space-y-6">
-                {/* Title */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Component Title
@@ -135,7 +127,6 @@ export default function EditorPage() {
                   />
                 </div>
 
-                {/* Description */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Description
@@ -149,7 +140,6 @@ export default function EditorPage() {
                   />
                 </div>
 
-                {/* Tags */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Tags
@@ -190,7 +180,6 @@ export default function EditorPage() {
                   )}
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex gap-3 pt-4">
                   <button
                     onClick={() => setShowDetailsModal(false)}

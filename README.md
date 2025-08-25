@@ -1,215 +1,216 @@
-# CompCraft
+# 🚀 CompCraft Visual Editor
 
-The ultimate visual React component editor with real-time preview, authentication, and cloud storage. Craft beautiful components effortlessly - paste any React component and edit it visually by clicking elements to change text, colors, fonts, and more.
+**Revolutionary AI-Powered Visual React Component Editor**
 
-## ✨ Features
+[![Next.js](https://img.shields.io/badge/Next.js-15.1.0-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3.3-blue)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4.0-38B2AC)](https://tailwindcss.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-6.18.0-green)](https://mongodb.com/)
 
-- **Visual Editing**: Click any element to edit text content, colors, font size, and font weight
-- **Real-time Preview**: See changes instantly as you edit
-- **Code Synchronization**: Visual changes automatically update the source code
-- **User Authentication**: Secure sign-in/sign-up with Clerk
-- **Cloud Storage**: Save and manage components in MongoDB
-- **Component Library**: Browse and organize your saved components
-- **Public Sharing**: Share components publicly with preview links
-- **Clean UI**: Modern black and white design with smooth interactions
+## 🤖 AI-Powered Features
 
-## 🚀 Getting Started
+### **Smart Component Generation**
+
+- **Natural Language to Code**: Describe any component in plain English and watch it come to life
+- **Google Gemini Integration**: Powered by Google's latest Gemini 1.5-flash model for high-quality code generation
+- **Context-Aware**: AI understands modern React patterns, Tailwind CSS, and responsive design
+
+### **Intelligent Code Parsing**
+
+- **Real-time Syntax Analysis**: Advanced Babel-based parsing for instant component understanding
+- **Multi-attribute Matching**: Sophisticated element identification using signatures, classes, and positioning
+- **Smart Text Replacement**: Precise content updates with fallback strategies
+
+## 🎨 Interactive Frontend
+
+### **Live Visual Editing**
+
+- **Click-to-Edit**: Simply click on any element in the preview to start editing
+- **Real-time Preview**: See changes instantly with split-pane editor and live preview
+- **Property Panel**: Comprehensive editing controls for text, colors, fonts, and styles
+
+### **Modern UI/UX**
+
+- **Beautiful Gradients**: Stunning visual design with animated backgrounds and smooth transitions
+- **Responsive Design**: Works perfectly on desktop and mobile devices
+- **Dark/Light Themes**: Adaptive theming for comfortable coding in any environment
+
+### **Advanced Preview System**
+
+- **Isolated Sandbox**: Safe component rendering in iframe with full React support
+- **Interactive Elements**: Hover effects and click handlers for intuitive interaction
+- **Error Handling**: Graceful error display with helpful debugging information
+
+## 🛠️ Technical Features
+
+### **Code Editor**
+
+- **Monaco Editor**: Professional code editing with syntax highlighting and IntelliSense
+- **Real-time Sync**: Seamless synchronization between code and visual changes
+- **Read-only Mode**: Safe viewing of components with full functionality
+
+### **Component Management**
+
+- **Cloud Storage**: Save and manage components with MongoDB integration
+- **User Authentication**: Secure user accounts with Clerk authentication
+- **Version Control**: Track changes and component history
+
+### **Performance Optimized**
+
+- **Dynamic Imports**: Lazy loading for optimal bundle size
+- **Efficient Rendering**: Optimized React components with proper memoization
+- **Fast AI Responses**: Optimized API calls with proper error handling
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 14+ and npm
-- MongoDB database (or MongoDB Atlas)
-- Clerk account for authentication
+- Node.js 18+
+- MongoDB database
+- Google Gemini API key
 
 ### Installation
 
 1. **Clone the repository**
 
-   ```bash
-   git clone <your-repo-url>
-   cd runable
-   ```
+```bash
+git clone <repository-url>
+cd compcraft
+```
 
 2. **Install dependencies**
 
-   ```bash
-   npm install
-   ```
+```bash
+npm install
+```
 
 3. **Set up environment variables**
 
-   Copy `.env.example` to `.env.local` and fill in your values:
+```bash
+# Create .env.local file
+cp .env.example .env.local
 
-   ```bash
-   cp .env.example .env.local
-   ```
-
-   Update `.env.local` with your credentials:
-
-   ```env
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key_here
-   CLERK_SECRET_KEY=your_clerk_secret_key_here
-   MONGODB_URL=your_mongodb_connection_string
-   ```
-
-4. **Get Clerk credentials**
-
-   - Go to [clerk.com](https://clerk.com) and create an account
-   - Create a new application
-   - Copy the publishable key and secret key from the dashboard
-   - Add them to your `.env.local` file
-
-5. **Set up MongoDB**
-
-   - The app will automatically create the necessary collections
-   - Make sure your MongoDB URL includes the database name (e.g., `/Runable`)
-
-6. **Run the development server**
-
-   ```bash
-   npm run dev
-   ```
-
-7. **Open your browser**
-
-   Navigate to [http://localhost:3000](http://localhost:3000)
-
-## 📱 Usage
-
-### For Guests (No Authentication Required)
-
-- Visit the homepage and click "Try Editor Now"
-- Paste any React component code
-- Click elements in the preview to edit them visually
-- Use Preview button to see changes
-
-### For Authenticated Users
-
-- Sign up/Sign in to save components permanently
-- Create components in the editor and save them
-- View all your components in the Dashboard
-- Edit saved components
-- Share public components with preview links
-- Delete components you no longer need
-
-## 🛠 API Endpoints
-
-- `POST /api/component` - Create a new component
-- `GET /api/component` - Get user's components list
-- `GET /api/component/[id]` - Get specific component (authenticated)
-- `PUT /api/component/[id]` - Update component
-- `DELETE /api/component/[id]` - Delete component
-- `GET /api/preview/[id]` - Get public component for preview
-
-## 🏗 Architecture
-
-### Frontend
-
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Monaco Editor** - Code editing with syntax highlighting
-- **Lucide React** - Icons
-- **Babel Standalone** - Runtime JSX transformation
-
-### Backend
-
-- **Next.js API Routes** - RESTful API
-- **MongoDB + Mongoose** - Database and ODM
-- **Clerk** - Authentication and user management
-
-### Key Components
-
-- `ComponentEditor` - Main editor interface
-- `Preview` - Iframe-based component rendering
-- `PropertyPanel` - Visual property editing interface
-- `CodeEditor` - Monaco-based code editor
-
-## 🎨 Visual Editing Features
-
-### Supported Properties
-
-- **Text Content** - Edit text directly with apply/cancel buttons
-- **Text Color** - Color picker with hex input
-- **Background Color** - Color picker with hex input
-- **Font Size** - Slider and number input (8px - 72px)
-- **Font Weight** - Visual weight selector (100-900)
-
-### Element Selection
-
-- Click any element in the preview to select it
-- Advanced element matching algorithm ensures precise targeting
-- Element signature system prevents conflicts
-- Visual outline shows selected element
-
-## 🔧 Development
-
-### Project Structure
-
-```
-app/
-├── api/           # API routes
-├── component/     # Component detail pages
-├── dashboard/     # User dashboard
-├── editor/        # Standalone editor
-├── preview/       # Public preview pages
-├── sign-in/       # Authentication pages
-└── sign-up/
-components/        # React components
-lib/              # Utilities (MongoDB, code parsing)
-models/           # Database schemas
-types/            # TypeScript definitions
+# Add your keys
+GEMINI_API_KEY=your_gemini_api_key
+MONGODB_URI=your_mongodb_uri
+CLERK_SECRET_KEY=your_clerk_secret
 ```
 
-### Key Files
+4. **Run the development server**
 
-- `lib/codeParser.ts` - JSX parsing and code modification
-- `lib/mongodb.ts` - Database connection
-- `models/Component.ts` - Component schema
-- `middleware.ts` - Clerk authentication middleware
+```bash
+npm run dev
+```
 
-## 🚀 Deployment
+5. **Open [http://localhost:3000](http://localhost:3000)**
 
-1. **Vercel (Recommended)**
+## 🎯 How to Use
 
-   ```bash
-   npm run build
-   vercel --prod
-   ```
+### Creating Components with AI
 
-2. **Environment Variables**
-   Add the same environment variables to your deployment platform
+1. Navigate to the editor (`/editor`)
+2. Click the **AI button** (✨) in the code editor
+3. Describe your component: _"Create a beautiful pricing card with gradient background and hover effects"_
+4. Watch as AI generates production-ready React code
+5. Edit visually by clicking elements in the preview
 
-3. **MongoDB Atlas**
-   Use MongoDB Atlas for production database
+### Manual Component Creation
+
+1. Paste your existing React component code
+2. Click **Preview** to see it rendered
+3. Click on any element to edit its properties
+4. Use the property panel for fine-tuned control
+5. Save your component to the cloud
+
+### Visual Editing Workflow
+
+1. **Select Element**: Click any element in the live preview
+2. **Edit Properties**: Use the property panel to modify text, colors, fonts
+3. **Real-time Updates**: See changes instantly reflected in the preview
+4. **Code Sync**: All visual changes are automatically synced to the code
+
+## 📁 Project Structure
+
+```
+compcraft/
+├── app/                    # Next.js app router
+│   ├── api/               # API routes
+│   │   ├── ai/           # AI component generation
+│   │   └── component/    # Component CRUD operations
+│   ├── dashboard/        # User dashboard
+│   ├── editor/          # Main visual editor
+│   └── preview/         # Component preview pages
+├── components/           # React components
+│   ├── CodeEditor.tsx   # Monaco code editor
+│   ├── ComponentEditor.tsx # Main editor interface
+│   ├── Preview.tsx      # Live component preview
+│   └── PropertyPanel.tsx # Visual property editor
+├── lib/                 # Utility functions
+│   ├── codeParser.ts   # Code parsing and manipulation
+│   └── mongodb.ts      # Database connection
+└── types/              # TypeScript definitions
+```
+
+## 🏗️ Architecture
+
+### **Frontend Architecture**
+
+- **Next.js 15**: App router with server components
+- **TypeScript**: Full type safety throughout
+- **Tailwind CSS**: Utility-first styling
+- **Clerk**: Authentication and user management
+
+### **Backend Architecture**
+
+- **API Routes**: Serverless functions for AI and CRUD operations
+- **MongoDB**: Document database for component storage
+- **Mongoose**: ODM for data modeling
+
+### **AI Integration**
+
+- **Google Gemini 1.5-flash**: Latest AI model for code generation
+- **Prompt Engineering**: Carefully crafted prompts for consistent results
+- **Error Handling**: Robust error handling for API failures
+
+## 🎨 Customization
+
+### **Themes and Styling**
+
+- Easily customizable color schemes
+- Configurable gradients and animations
+- Extensible component library
+
+### **AI Prompts**
+
+- Modify AI generation prompts in `/api/ai/route.ts`
+- Add new component templates
+- Customize code generation rules
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-MIT License - feel free to use this project for your own purposes.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🐛 Known Issues
+## 🙏 Acknowledgments
 
-- Clerk dependency has a peer dependency warning with Next.js 14.0.4 (resolved with --force flag)
-- Some complex React components may require manual code adjustments
-- Environment variables must be properly configured for authentication to work
+- **Google Gemini**: For powering the AI component generation
+- **Next.js Team**: For the incredible React framework
+- **Tailwind CSS**: For the utility-first CSS framework
+- **Monaco Editor**: For the professional code editing experience
 
-## 💡 Future Enhancements
+## 📞 Support
 
-- Drag and drop component builder
-- More CSS property support
-- Component templates library
-- Collaborative editing
-- Export to different formats
-- Mobile responsive editor
+For support, email support@compcraft.dev or join our Discord community.
 
 ---
 
-**Happy Coding!** 🎉
+**Made with ❤️ for developers who want to build beautiful components faster**
+
+[Get Started →](https://compcraft.dev) | [Documentation →](https://docs.compcraft.dev) | [Community →](https://discord.gg/compcraft)

@@ -62,7 +62,6 @@ export default function ComponentEditor({
   const [aiGenerating, setAiGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
 
-  // Update when initialCode changes
   useEffect(() => {
     setCode(initialCode);
     setPreviewCode(initialCode);
@@ -160,7 +159,6 @@ export default function ComponentEditor({
 
   return (
     <div className="h-screen flex bg-gradient-to-br from-gray-900 to-gray-800">
-      {/* Code Editor */}
       <div className="w-1/2 border-r border-gray-700 flex flex-col bg-gray-900/95 backdrop-blur-sm">
         <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-bold text-gray-300">Code Editor</h2>
@@ -221,9 +219,7 @@ export default function ComponentEditor({
         </div>
       </div>
 
-      {/* Preview and Properties */}
       <div className="w-1/2 flex flex-col bg-gray-900/95 backdrop-blur-sm">
-        {/* Preview */}
         <div className="flex-1 flex flex-col">
           <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800">
             <h2 className="text-sm font-bold text-gray-300">Live Preview ✨</h2>
@@ -256,7 +252,6 @@ export default function ComponentEditor({
           </div>
         </div>
 
-        {/* Property Panel */}
         {selectedElement && (
           <div className="h-80 border-t border-gray-700 bg-gradient-to-br from-gray-900 to-gray-800">
             <PropertyPanel
@@ -268,7 +263,6 @@ export default function ComponentEditor({
         )}
       </div>
 
-      {/* AI Modal */}
       {showAiModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">

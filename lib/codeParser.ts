@@ -45,9 +45,6 @@ export function updateComponentCode(
   property: string,
   value: string
 ): string {
-  console.log(`[CodeParser] Updating ${property} to ${value}`);
-  console.log(`[CodeParser] Target element:`, selectedElement);
-
   if (property === "text") {
     return updateTextContent(code, selectedElement, value);
   } else {
@@ -61,10 +58,6 @@ function updateTextContent(
   newText: string
 ): string {
   if (!selectedElement.text) return code;
-
-  console.log(
-    `[CodeParser] Updating text from "${selectedElement.text}" to "${newText}"`
-  );
 
   // Strategy 1: Exact text match with tag context
   if (selectedElement.tagName && selectedElement.signature) {
@@ -93,7 +86,6 @@ function updateTextContent(
 
     for (const pattern of patterns) {
       if (pattern && code.match(pattern)) {
-        console.log(`[CodeParser] Found text pattern match`);
         return code.replace(pattern, (match, openTag, content, closeTag) => {
           const newContent = content.replace(
             new RegExp(escapeRegExp(selectedElement.text!), "gi"),
@@ -106,7 +98,6 @@ function updateTextContent(
   }
 
   // Fallback: Simple text replacement (less precise)
-  console.log(`[CodeParser] Using fallback text replacement`);
   return code.replace(
     new RegExp(escapeRegExp(selectedElement.text), "g"),
     newText
@@ -119,10 +110,7 @@ function updateStyleProperty(
   property: string,
   value: string
 ): string {
-  console.log(`[CodeParser] Updating style ${property} to ${value}`);
-
   if (!selectedElement.signature) {
-    console.log(`[CodeParser] No signature available, skipping update`);
     return code;
   }
 
@@ -133,11 +121,9 @@ function updateStyleProperty(
   const targetElement = elementMatcher.findBestMatch();
 
   if (targetElement) {
-    console.log(`[CodeParser] Found target element:`, targetElement);
     return updateElementStyle(code, targetElement, property, value);
   }
 
-  console.log(`[CodeParser] Could not find target element for style update`);
   return code;
 }
 
@@ -243,12 +229,6 @@ class ElementMatcher {
       score += 10;
     }
 
-    console.log(`[ElementMatcher] Element score: ${score}`, {
-      textContent: textContent.substring(0, 30),
-      position,
-      signature,
-    });
-
     return score;
   }
 
@@ -272,7 +252,6 @@ function updateElementStyle(
   if (existingStyleMatch) {
     // Update existing style
     const existingStyles = existingStyleMatch[1];
-    console.log(`[CodeParser] Updating existing styles:`, existingStyles);
 
     const styleObj = parseInlineStyles(existingStyles);
 
@@ -307,7 +286,6 @@ function updateElementStyle(
   }
 
   const newElement = newOpenTag + content + closeTag;
-  console.log(`[CodeParser] Style update complete`);
 
   return code.replace(fullMatch, newElement);
 }

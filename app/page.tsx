@@ -18,34 +18,28 @@ import Navbar from "@/components/Navbar";
 export default function Home() {
   const { user, isLoaded } = useUser();
 
-  // User is logged in - stay on landing page with logged-in status
   if (isLoaded && user) {
     console.log("User is logged in:", user.id);
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-40 right-20 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-full blur-3xl animate-pulse delay-500"></div>
       </div>
 
-      {/* Navbar */}
       <Navbar subtitle="Visual. Powerful. Instant." />
 
-      {/* Hero Section */}
       <main className="relative max-w-7xl mx-auto px-6 py-20">
         <div className="text-center mb-20">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 border border-blue-200 rounded-full text-sm font-medium text-blue-700 mb-8">
             <Star className="w-4 h-4 text-yellow-500" />
             Revolutionary Visual Development
             <Sparkles className="w-4 h-4 text-purple-500" />
           </div>
 
-          {/* Main Heading */}
           <h2 className="text-6xl md:text-7xl font-extrabold mb-8 leading-tight">
             <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
               CompCraft

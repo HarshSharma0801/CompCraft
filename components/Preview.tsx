@@ -21,15 +21,9 @@ export default function Preview({
   const [iframeKey, setIframeKey] = useState(0);
 
   useEffect(() => {
-    console.log(
-      "[Preview] Code changed, forcing iframe recreation:",
-      code.substring(0, 50) + "..."
-    );
-
     setIsLoading(true);
     setError(null);
 
-    // Force iframe to recreate by updating key
     setIframeKey((prev) => prev + 1);
   }, [code]);
 
@@ -42,11 +36,6 @@ export default function Preview({
         presets: ["react"],
         filename: "component.jsx",
       }).code;
-
-      console.log(
-        "[Preview] Transformed code:",
-        transformedCode?.substring(0, 100) + "..."
-      );
 
       // Create the HTML content for the iframe
       const html = `
@@ -94,8 +83,7 @@ export default function Preview({
           <body>
             <div id="root"></div>
             <script>
-              console.log('[IFrame] Script starting');
-              
+
               // Safely get React and ReactDOM
               const React = window.React;
               const ReactDOM = window.ReactDOM;
@@ -103,8 +91,6 @@ export default function Preview({
               if (!React || !ReactDOM) {
                 throw new Error('React or ReactDOM not loaded');
               }
-              
-              console.log('[IFrame] React and ReactDOM loaded successfully');
 
               // Helper function to get element signature for precise matching
               function getElementSignature(element) {
@@ -214,7 +200,7 @@ export default function Preview({
                       bounds: element.getBoundingClientRect()
                     };
                     
-                    console.log('[IFrame] Selected element:', elementInfo);
+
                     
                     // Send message to parent
                     window.parent.postMessage({
@@ -232,8 +218,7 @@ export default function Preview({
               }
 
               try {
-                console.log('[IFrame] Starting component execution');
-                
+
                 // Clean up any previous components
                 Object.keys(window).forEach(key => {
                   if (typeof window[key] === 'function' && 
@@ -241,13 +226,11 @@ export default function Preview({
                       key !== 'React' && 
                       key !== 'ReactDOM' &&
                       !key.startsWith('_')) {
-                    console.log('[IFrame] Cleaning up:', key);
                     delete window[key];
                   }
                 });
 
                 // Execute the transformed code
-                console.log('[IFrame] Executing transformed code');
                 eval(\`${transformedCode || ""}\`);
                 
                 // Find the component function
@@ -262,7 +245,6 @@ export default function Preview({
                 let Component = null;
                 if (componentKeys.length > 0) {
                   Component = window[componentKeys[componentKeys.length - 1]];
-                  console.log('Found component:', componentKeys[componentKeys.length - 1]);
                 } else {
                   throw new Error('No component function found after execution');
                 }
@@ -305,13 +287,10 @@ export default function Preview({
       // Write the content to the iframe
       const iframeDoc = iframeRef.current.contentDocument;
       if (iframeDoc) {
-        console.log("[Preview] Writing to iframe document");
-
         // Write the new content
         iframeDoc.open();
         iframeDoc.write(html);
         iframeDoc.close();
-        console.log("[Preview] Iframe content written successfully");
       }
 
       setError(null);
@@ -327,14 +306,11 @@ export default function Preview({
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
-      console.log("[Preview] Received message:", event.data);
       if (event.data.type === "element-selected") {
         onElementSelect(event.data.element);
       } else if (event.data.type === "preview-loaded") {
-        console.log("[Preview] Preview loaded successfully");
         setIsLoading(false);
       } else if (event.data.type === "preview-error") {
-        console.error("[Preview] Preview error:", event.data.error);
         setError(event.data.error);
         setIsLoading(false);
       }
