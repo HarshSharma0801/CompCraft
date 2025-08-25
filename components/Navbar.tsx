@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import { ArrowLeft, Save, Code2, LogOut } from "lucide-react";
 import Link from "next/link";
 import { SignOutButton } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 interface NavbarProps {
   showBackButton?: boolean;
@@ -24,6 +25,7 @@ export default function Navbar({
   variant = "light",
 }: NavbarProps) {
   const { user, isLoaded } = useUser();
+  const router = useRouter();
 
   const bgClasses =
     variant === "light"
@@ -41,18 +43,14 @@ export default function Navbar({
     <header className={`relative ${bgClasses} border-b shadow-lg`}>
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {showBackButton && (
-              <Link
-                href={backUrl}
-                className={`p-2 rounded-xl transition-all duration-300 backdrop-blur-sm ${buttonClasses}`}
-              >
-                <ArrowLeft className="w-5 h-5" />
-              </Link>
-            )}
-
+          <div
+            onClick={() => {
+              router.push("/");
+            }}
+            className="flex cursor-pointer items-center gap-4"
+          >
             <div className="flex items-center gap-3">
-              <div className="relative">
+              <div className="relative ">
                 <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl blur opacity-75"></div>
                 <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 p-2 rounded-xl">
                   <Code2 className="w-6 h-6 text-white" />

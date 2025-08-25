@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-import { Play, Save, Settings } from "lucide-react";
+import { Play, Save, Settings, Sparkles, X } from "lucide-react";
 import CodeEditor from "./CodeEditor";
 import Preview from "./Preview";
 import PropertyPanel from "./PropertyPanel";
@@ -57,6 +57,10 @@ export default function ComponentEditor({
   const [error, setError] = useState<string | null>(null);
   const [parsedComponent, setParsedComponent] = useState<any>(null);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showAiModal, setShowAiModal] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
 
   // Update when initialCode changes
   useEffect(() => {
@@ -121,6 +125,39 @@ export default function ComponentEditor({
     setHasUnsavedChanges(false);
   };
 
+  const handleAiGenerate = async () => {
+    if (!aiPrompt.trim()) return;
+
+    setAiGenerating(true);
+    setAiError(null);
+    try {
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt: aiPrompt }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setCode(data.code);
+        setPreviewCode(data.code);
+        setShowAiModal(false);
+        setAiPrompt("");
+        setHasUnsavedChanges(false);
+      } else {
+        setAiError(data.error || "Failed to generate component");
+      }
+    } catch (error) {
+      setAiError("Network error occurred");
+      console.error("Error generating component:", error);
+    } finally {
+      setAiGenerating(false);
+    }
+  };
+
   return (
     <div className="h-screen flex bg-gradient-to-br from-gray-900 to-gray-800">
       {/* Code Editor */}
@@ -128,6 +165,13 @@ export default function ComponentEditor({
         <div className="px-4 py-3 border-b border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800 flex items-center justify-between">
           <h2 className="text-sm font-bold text-gray-300">Code Editor</h2>
           <div className="flex gap-3">
+            <button
+              onClick={() => setShowAiModal(true)}
+              className="flex items-center gap-2 px-4 py-2 text-xs rounded-xl font-medium transition-all duration-300 bg-gradient-to-r from-pink-500 to-purple-600 text-white hover:from-pink-600 hover:to-purple-700 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
+              <Sparkles className="w-3 h-3" />
+              AI
+            </button>
             {showDetailsButton && (
               <button
                 onClick={() => {
@@ -223,6 +267,62 @@ export default function ComponentEditor({
           </div>
         )}
       </div>
+
+      {/* AI Modal */}
+      {showAiModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-gray-900">
+                  Generate Component with AI
+                </h2>
+                <button
+                  onClick={() => setShowAiModal(false)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-500" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <textarea
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                  placeholder="Describe the component you want to generate..."
+                  rows={4}
+                />
+
+                {aiError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-600 text-sm">{aiError}</p>
+                  </div>
+                )}
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowAiModal(false);
+                      setAiError(null);
+                    }}
+                    className="flex-1 px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleAiGenerate}
+                    disabled={!aiPrompt.trim() || aiGenerating}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white rounded-lg hover:from-pink-600 hover:to-purple-700 transition-colors disabled:opacity-50"
+                  >
+                    {aiGenerating ? "Generating..." : "Generate"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
