@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   title: "CompCraft",
   description:
     "The ultimate visual React component editor - build, edit, and share components effortlessly",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
